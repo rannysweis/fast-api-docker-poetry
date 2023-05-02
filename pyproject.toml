@@ -1,0 +1,50 @@
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "fast-api-docker-poetry"
+version = "0.1.0"
+description = "Fast Api example using docker and poetry"
+authors = ["Ranny Sweis"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+fastapi = "^0.95.1"
+uvicorn = "^0.18.2"
+requests = "^2.28.1"
+python-multipart = "^0.0.5"
+fastapi-utils = "^0.2.1"
+httpx = "^0.24.0"
+alembic = "^1.10.4"
+python-ulid = "^1.1.0"
+psycopg2-binary = "^2.9.6"
+backoff = "^2.2.1"
+
+[tool.poetry.dev-dependencies]
+black = "^22.6.0"
+pyproject-flake8 = "^0.0.1a4"
+pre-commit = "^2.19.0"
+pytest = "^7.1.2"
+pytest-cov = "^3.0.0"
+types-PyYAML = "^6.0.9"
+
+[tool.black]
+line-length = 100
+target-version = ['py310']
+
+[tool.pytest.ini_options]
+testpaths = [
+    "tests"
+]
+# Prevents pytest from buffering output until the end of a failed test
+log_cli = true
+log_cli_level = "INFO"
+log_cli_format = "%(asctime)s [%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)"
+log_cli_date_format = "%Y-%m-%d %H:%M:%S"
+
+[tool.pydantic-pycharm-plugin]
+# Highlights are either "warning",  "weak_warning" or "disable"
+parsable-type-highlight = "disable" # This is defined as parsable so don't warn on it
+acceptable-type-highlight = "warning"
+

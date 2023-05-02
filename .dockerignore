@@ -1,0 +1,7 @@
+**/*.pyc
+__pycache__
+.pytest_cache
+.pgdata
+.venv
+gen
+build

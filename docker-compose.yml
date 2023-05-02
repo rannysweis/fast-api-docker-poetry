@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  fast-api-docker-poetry:
+    image: local/fast-api-docker-poetry:${BUILD_TAG:-local-dev}
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: ${TARGET:-development}
+    environment:
+      POSTGRES_DB_HOST: postgresql
+    volumes:
+      - ./app:/home/appuser/app
+      - ./tests:/home/appuser/tests
+    depends_on:
+      - fast-api-postgres
+    links:
+      - fast-api-postgres:postgresql
+
+  fast-api-postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: fastapi_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
