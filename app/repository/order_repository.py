@@ -3,9 +3,9 @@ import logging
 from sqlalchemy import or_
 from sqlalchemy.exc import NoResultFound
 
-from app.config.db import get_db
 from app.models.order import OrderOrm
 from app.repository.base_repository import BaseRepository
+from app.utils.db import get_db
 
 logger = logging.getLogger(__name__)
 
