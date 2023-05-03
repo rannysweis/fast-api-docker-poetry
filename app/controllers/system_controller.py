@@ -2,7 +2,7 @@ from typing import Dict
 
 from fastapi import status, APIRouter
 from fastapi.responses import JSONResponse
-from fastapi_utils.cbv import cbv
+from fastapi_restful.cbv import cbv
 
 system_router = APIRouter()
 

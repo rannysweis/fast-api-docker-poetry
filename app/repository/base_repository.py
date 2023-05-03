@@ -2,8 +2,8 @@ import logging
 
 from sqlalchemy.exc import IntegrityError, ProgrammingError, NoResultFound
 
-from app.config.db import get_db
 from app.models.base import BaseOrm
+from app.utils.db import get_db
 
 logger = logging.getLogger(__name__)
 

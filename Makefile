@@ -1,5 +1,5 @@
 startd:
-	TARGET=release docker-compose up -d --build \
+	docker-compose up -d --build \
 		&& docker-compose run --rm fast-api-docker-poetry poetry run alembic upgrade head
 
 testd:
@@ -15,5 +15,9 @@ testp:
 	docker-compose up fast-api-postgres -d --build \
 	&& poetry run pytest -v
 
-formatp:
-	poetry run black app tests
+create-migration: ## Create an alembic migration
+	@read -p "Enter rev id: " message; \
+	poetry run alembic revision --autogenerate --rev-id "$$message"
+
+#formatp:
+#	poetry run black app tests

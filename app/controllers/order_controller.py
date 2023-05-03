@@ -1,7 +1,7 @@
 from typing import List
 
 from fastapi import Depends, APIRouter
-from fastapi_utils.cbv import cbv
+from fastapi_restful.cbv import cbv
 from starlette.status import HTTP_201_CREATED
 
 from app.models.order import OrderSchema, OrderOrm

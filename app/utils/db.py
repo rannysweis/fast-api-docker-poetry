@@ -4,7 +4,7 @@ from typing import Iterator
 
 import backoff
 import psycopg2
-from fastapi_utils.session import FastAPISessionMaker
+from fastapi_restful.session import FastAPISessionMaker
 from psycopg2 import OperationalError
 from sqlalchemy.orm import Session
 
@@ -21,7 +21,6 @@ def get_db() -> Iterator[Session]:
 
 @lru_cache()
 def _get_fastapi_sessionmaker() -> FastAPISessionMaker:
-    """This function could be replaced with a global variable if preferred"""
     url = get_database_settings().url
 
     return FastAPISessionMaker(url)
@@ -34,7 +33,7 @@ def shutdown() -> None:
 
 
 @backoff.on_exception(backoff.expo, OperationalError, max_time=settings.db_retry_window_seconds, logger=logger)
-def wait_for_postgres() -> None:  # pragma: no cover
+def wait_for_postgres() -> None:
     print(f"Connecting to postgres...")
     dsn = get_database_settings().url
     conn = psycopg2.connect(dsn)

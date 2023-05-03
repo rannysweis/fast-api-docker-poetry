@@ -6,7 +6,7 @@ from sqlalchemy import (
     Column,
     String,
     Float,
-    ForeignKey, Integer,
+    ForeignKey, BigInteger,
 )
 from sqlalchemy.orm import relationship
 
@@ -20,8 +20,8 @@ class OrderOrm(BaseOrm):
     order_number = Column(String, default=lambda: ''.join(random.choices(string.ascii_uppercase + string.digits, k=6)))
     name = Column(String)
     price = Column(Float)
-    pickup_id = Column(Integer, ForeignKey("addresses.id"))
-    dropoff_id = Column(Integer, ForeignKey("addresses.id"))
+    pickup_id = Column(BigInteger, ForeignKey("addresses.id"))
+    dropoff_id = Column(BigInteger, ForeignKey("addresses.id"))
 
     pickup_address = relationship(AddressOrm, foreign_keys="OrderOrm.pickup_id", lazy="joined", cascade="all,delete")
     dropoff_address = relationship(AddressOrm, foreign_keys="OrderOrm.dropoff_id", lazy="joined", cascade="all,delete")

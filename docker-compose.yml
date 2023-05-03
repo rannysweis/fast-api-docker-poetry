@@ -18,7 +18,7 @@ services:
       - fast-api-postgres:postgresql
 
   fast-api-postgres:
-    image: postgres:13
+    image: postgres:15-alpine
     environment:
       POSTGRES_DB: fastapi_db
       POSTGRES_USER: postgres

@@ -4,7 +4,7 @@ from typing import Optional
 import sqlalchemy as sa
 from pydantic import BaseModel
 from pydantic import Field
-from sqlalchemy import Column, DateTime, Integer
+from sqlalchemy import Column, DateTime, BigInteger
 from sqlalchemy import MetaData
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -32,7 +32,7 @@ class BaseOrm(Base):
     __abstract__ = True
     __table_args__ = {"extend_existing": True}
 
-    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
+    id = Column(BigInteger, primary_key=True, autoincrement=True, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=False)
     updated_at = Column(
         DateTime(timezone=True),
