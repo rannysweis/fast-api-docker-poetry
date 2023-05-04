@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from pydantic import Field
 from sqlalchemy import Column, DateTime, BigInteger
 from sqlalchemy import MetaData
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base
 
 """
 alembic requires constraints to be named.

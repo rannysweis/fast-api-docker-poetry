@@ -5,7 +5,7 @@ from requests import HTTPError
 from sqlalchemy.exc import IntegrityError, ProgrammingError, NoResultFound
 from starlette.exceptions import HTTPException
 
-from app.config import exception_handlers as exh
+from app.config import exception_config as exh
 from app.config.settings import Environment, get_settings
 from app.controllers.order_controller import order_router
 from app.controllers.system_controller import system_router
