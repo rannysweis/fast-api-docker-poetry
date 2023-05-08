@@ -15,9 +15,8 @@ class PageRequestSchema(BaseModel):
     def offset(self):
         return (self.page - 1) * self.size
 
-    def build(self, query: Query, sort):
-        sort = sort.asc() if self.direction == "ASC" else sort.desc()
-        return query.order_by(sort).limit(self.size).offset(self.offset)
+    def sql_sort(self, sort):
+        return sort.asc() if self.direction == "ASC" else sort.desc()
 
 
 class PageResponseSchema(BaseModel):

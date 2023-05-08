@@ -1,4 +1,5 @@
-from starlette.testclient import TestClient
+import pytest
+from httpx import AsyncClient
 
 
 def get_address_dict():
@@ -41,23 +42,26 @@ def assert_valid_order(address_dict, response):
     assert pickup_address["longitude"] == address_dict["longitude"]
 
 
+pytestmark = pytest.mark.asyncio
+
+
 class TestOrderController:
-    def test_create_order(self, client: TestClient):
+    async def test_create_order(self, async_client: AsyncClient):
         address_dict = get_address_dict()
         order_dict = get_order_dict(address_dict)
 
-        response = client.post("/order", json=order_dict)
+        response = await async_client.post("/order", json=order_dict)
 
         assert response.status_code == 201
         assert_valid_order(address_dict, response)
 
-    def test_create_order_error(self, client: TestClient):
+    async def test_create_order_error(self, async_client: AsyncClient):
         address_dict = get_address_dict()
         address_dict["postal_code"] += "123123"
         order_dict = get_order_dict(address_dict)
         order_dict["price"] = None
 
-        response = client.post("/order", json=order_dict)
+        response = await async_client.post("/order", json=order_dict)
 
         assert response.status_code == 422
         assert response.json()["errors"] == [{
@@ -74,19 +78,19 @@ class TestOrderController:
             'msg': 'ensure this value has at most 10 characters'
         }]
 
-    def test_get_order(self, client: TestClient):
+    async def test_get_order(self, async_client: AsyncClient):
         address_dict = get_address_dict()
         order_dict = get_order_dict(address_dict)
-        response = client.post("/order", json=order_dict)
+        response = await async_client.post("/order", json=order_dict)
         order_id = response.json()["id"]
 
-        response2 = client.get(f"/order/{order_id}")
+        response2 = await async_client.get(f"/order/{order_id}")
 
         assert response2.status_code == 200
         assert_valid_order(address_dict, response2)
 
-    def test_get_order_error(self, client: TestClient):
-        response = client.get("/order/123")
+    async def test_get_order_error(self, async_client: AsyncClient):
+        response = await async_client.get("/order/123")
 
         assert response.status_code == 404
         assert response.json()["errors"] == [{
@@ -94,53 +98,62 @@ class TestOrderController:
             "msg": "No row was found when one was required"
         }]
 
-    def test_get_order_by_address(self, client: TestClient):
+    async def test_get_order_by_address(self, async_client: AsyncClient):
         address_dict = get_address_dict()
         order_dict = get_order_dict(address_dict)
-        response = client.post("/order", json=order_dict)
+        response = await async_client.post("/order", json=order_dict)
         address_id = response.json()["dropoff_address"]["id"]
 
-        response2 = client.get(f"/order/address/{address_id}")
+        response2 = await async_client.get(f"/order/address/{address_id}")
 
         assert response2.status_code == 200
         assert_valid_order(address_dict, response2)
 
-    def test_update_order(self, client: TestClient):
+    async def test_get_order_by_address_error(self, async_client: AsyncClient):
+        response = await async_client.get(f"/order/address/123")
+
+        assert response.status_code == 404
+        assert response.json()["errors"] == [{
+            "title": "Not Found Error",
+            "msg": "No row was found when one was required"
+        }]
+
+    async def test_update_order(self, async_client: AsyncClient):
         address_dict = get_address_dict()
         order_dict = get_order_dict(address_dict)
-        response = client.post("/order", json=order_dict)
+        response = await async_client.post("/order", json=order_dict)
         order_id = response.json()["id"]
         order_dict["name"] = "iphone"
 
-        response2 = client.put(f"/order/{order_id}", json=order_dict)
+        response2 = await async_client.put(f"/order/{order_id}", json=order_dict)
 
         assert response2.status_code == 200
         assert order_id == response2.json()["id"]
         assert response2.json()["name"] == "iphone"
 
-    def test_list_order(self, client: TestClient):
+    async def test_list_order(self, async_client: AsyncClient):
         address_dict = get_address_dict()
         order_dict = get_order_dict(address_dict)
 
         for i in range(10):
             order_dict["name"] = f"order {i}"
-            client.post("/order", json=order_dict)
+            await async_client.post("/order", json=order_dict)
 
-        response = client.get(f"/orders?page=1&size=6&sort=name&direction=ASC")
+        response = await async_client.get(f"/orders?page=1&size=6&sort=name&direction=ASC")
 
         assert response.status_code == 200
         assert len(response.json()["data"]) == 6
         assert response.json()["total_count"] == 10
 
-    def test_list_order_error(self, client: TestClient):
+    async def test_list_order_error(self, async_client: AsyncClient):
         address_dict = get_address_dict()
         order_dict = get_order_dict(address_dict)
 
         for i in range(10):
             order_dict["name"] = f"order {i}"
-            client.post("/order", json=order_dict)
+            await async_client.post("/order", json=order_dict)
 
-        response = client.get(f"/orders?page=1&size=6&sort=test&direction=ASC")
+        response = await async_client.get(f"/orders?page=1&size=6&sort=test&direction=ASC")
 
         assert response.status_code == 422
         assert response.json()["errors"] == [{
