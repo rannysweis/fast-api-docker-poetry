@@ -1,5 +1,11 @@
 # Fast Api / Docker / Poetry 
 
+## Contents
+1. [Requirments](https://github.com/rannysweis/fast-api-docker-poetry#Requirments)
+2. [Best Practices](https://github.com/rannysweis/fast-api-docker-poetry#Best-Practices)
+3. [File structure](https://github.com/rannysweis/fast-api-docker-poetry#File-structure)
+4. [Quick Start](https://github.com/rannysweis/fast-api-docker-poetry#Quick-Start)
+
 ## Requirments
  - docker
  - docker compose
@@ -17,9 +23,31 @@
    ```
       application.add_exception_handler(HTTPException, exh.http_exception_handler)
    ```
+3. Use `@cbv` decorator to initialize shared dependencies.
+   ```
+      @cbv(order_router)
+      class OrderController:
+          def __init__(self):
+              self.order_service = OrderService()
+   ```
+4. Log and raise original DB exceptions
+   ```
+      try:
+          ...
+      except IntegrityError as e:
+          logger.exception(f'{self.__model__.__name__} error: {e.orig}')
+          raise e
+      except ProgrammingError as e:
+          logger.exception(f'{self.__model__.__name__} error: {e}')
+          raise e
+   ```
+5. Model files has ORM and pydantic classes for easier updates (Might not be the best solution for all)
+   - Schema - request/response object. It uses `BaseSchema.to_orm` to convert to ORM
+   - ORM - DB object
 
 
-### File structure
+
+## File structure
 ```
 fast-api-docker-poetry 
 ├── app
@@ -53,7 +81,7 @@ fast-api-docker-poetry
 
 
 
-# Quick Start
+## Quick Start
 
 1. Start with docker
     ```
