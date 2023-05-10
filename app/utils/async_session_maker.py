@@ -1,8 +1,7 @@
-from contextlib import asynccontextmanager
-from typing import Optional, AsyncIterator
+from typing import Optional
 
 from sqlalchemy import AsyncAdaptedQueuePool
-from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker, create_async_engine, AsyncSession
+from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker, create_async_engine
 
 """
 Used https://github.com/yuval9313/FastApi-RESTful/blob/master/fastapi_restful/session.py as example 
@@ -69,34 +68,6 @@ class AsyncSessionMaker:
         engine = engine or self.cached_engine
         return get_sessionmaker_for_engine(engine)
 
-    def get_db(self) -> AsyncIterator[AsyncSession]:
-        """
-        A generator function that yields a sqlalchemy orm session and cleans up the session once resumed after yielding.
-
-        Can be used directly as a context-manager FastAPI dependency, or yielded from inside a separate dependency.
-        """
-        yield from _get_db(self.cached_sessionmaker)
-
-    @asynccontextmanager
-    def context_session(self) -> AsyncIterator[AsyncSession]:
-        """
-        A context-manager wrapped version of the `get_db` method.
-
-        This makes it possible to get a context-managed orm session for the relevant database_uri without
-        needing to rely on FastAPI's dependency injection.
-        """
-        yield from self.get_db()
-
-    def reset_cache(self) -> None:
-        """
-        Resets the engine and sessionmaker caches.
-
-        After calling this method, the next time you try to use the cached engine or sessionmaker,
-        new ones will be created.
-        """
-        self._cached_engine = None
-        self._cached_sessionmaker = None
-
 
 def get_engine(uri: str) -> AsyncEngine:
     """
@@ -114,32 +85,3 @@ def get_sessionmaker_for_engine(engine: AsyncEngine) -> async_sessionmaker:
     This function may be updated over time to reflect recommended sessionmaker configuration for use with FastAPI.
     """
     return async_sessionmaker(bind=engine, expire_on_commit=False)
-
-
-@asynccontextmanager
-def context_session(engine: AsyncEngine) -> AsyncIterator[AsyncSession]:
-    """
-    This contextmanager yields a managed session for the provided engine.
-
-    Usage is similar to `AsyncSessionMaker.context_session`, except that you have to provide the engine to use.
-
-    A new sessionmaker is created for each call, so the AsyncSessionMaker.context_session
-    method may be preferable in performance-sensitive contexts.
-    """
-    sessionmaker = get_sessionmaker_for_engine(engine)
-    yield from _get_db(sessionmaker)
-
-
-def _get_db(sessionmaker: async_sessionmaker) -> AsyncIterator[AsyncSession]:
-    """
-    A generator function that yields an ORM session using the provided sessionmaker, and cleans it up when resumed.
-    """
-    session = sessionmaker()
-    try:
-        yield session
-        session.commit()
-    except Exception as exc:
-        session.rollback()
-        raise exc
-    finally:
-        session.close()
