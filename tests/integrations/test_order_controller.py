@@ -141,19 +141,18 @@ class TestOrderController:
     async def test_list_order(self, async_client: AsyncClient):
         address_dict = get_address_dict()
         order_dict = get_order_dict(address_dict)
-        # start_time = time.perf_counter()
-        for _ in range(10):
-            await async_client.post("/order", json=order_dict)
-        # tasks = [create_task(self.post_order(async_client, order_dict)) for _ in range(10)]
-        # done, pending = await asyncio.wait(tasks, timeout=1)
-        # for task in pending:
-        #     task.cancel()
-        # for task in done:
-        #     task.result()
-        # end_time = time.perf_counter()
+        start_time = time.perf_counter()
+        tasks = [create_task(self.post_order(async_client, order_dict)) for _ in range(10)]
+        done, pending = await asyncio.wait(tasks, timeout=1)
+        for task in pending:
+            task.cancel()
+        for task in done:
+            task.result()
+        end_time = time.perf_counter()
 
         response = await async_client.get(f"/orders?page=1&size=6&sort=name&direction=ASC")
 
+        assert end_time - start_time < 1
         assert response.status_code == 200
         assert len(response.json()["data"]) == 6
         assert response.json()["total_count"] == 10

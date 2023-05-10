@@ -1,5 +1,4 @@
 import logging
-from functools import lru_cache
 from typing import AsyncIterator
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -13,18 +12,12 @@ settings: Settings = get_settings()
 
 def get_async_db() -> AsyncIterator[AsyncSession]:
     """FastAPI dependency that provides a sqlalchemy session"""
-    return get_async_sessionmaker().cached_sessionmaker()
-
-
-@lru_cache()
-def get_async_sessionmaker() -> AsyncSessionMaker:
-    url = get_database_settings().async_url
-
-    return AsyncSessionMaker(url)
+    async_url = get_database_settings().async_url
+    return AsyncSessionMaker(async_url).cached_sessionmaker()
 
 
 def shutdown() -> None:
     logger.info("Shutting down database connections")
 
-    get_async_sessionmaker().cached_engine.dispose()
-
+    async_url = get_database_settings().async_url
+    AsyncSessionMaker(async_url).cached_engine.dispose()

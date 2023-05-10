@@ -4,7 +4,7 @@ from sqlalchemy import select, delete, func
 from sqlalchemy.exc import IntegrityError, ProgrammingError, NoResultFound
 
 from app.models.base import BaseOrm
-from app.utils.async_db import get_async_db, get_async_sessionmaker
+from app.utils.async_db import get_async_db
 
 logger = logging.getLogger(__name__)
 
@@ -29,8 +29,6 @@ class BaseRepository(object):
             except ProgrammingError as e:
                 logger.exception(f'{self.__model__.__name__} error: {e}')
                 raise e
-            finally:
-                await get_async_sessionmaker().cached_engine.dispose()
 
     async def insert(self, obj, **kwargs):
         db_obj = self.__model__(**obj.__dict__)
@@ -55,13 +53,10 @@ class BaseRepository(object):
             except ProgrammingError as e:
                 logger.exception(f'{self.__model__.__name__} error: {e}')
                 raise e
-            finally:
-                await get_async_sessionmaker().cached_engine.dispose()
 
     async def get_by_id(self, id, *args):
         async with get_async_db() as db:
             try:
-                # return db.query(self.__model__).filter_by(id=id).one()
                 execute = await db.execute(select(self.__model__).filter_by(id=id))
                 return execute.one()[0]
             except NoResultFound as e:
@@ -75,19 +70,15 @@ class BaseRepository(object):
             except ProgrammingError as e:
                 logger.exception(f'{self.__model__.__name__} error: {e}')
                 raise e
-            finally:
-                await get_async_sessionmaker().cached_engine.dispose()
 
     async def delete_by_id(self, id):
         async with get_async_db() as db:
-            # db.query(self.__model__).filter_by(id=id).delete()
             await db.execute(delete(self.__model__).filter_by(id=id))
             await db.commit()
 
     async def get_by_ids(self, ids, *args):
         async with get_async_db() as db:
             try:
-                # return db.query(self.__model__).filter(self.__model__.id.in_(ids)).all()
                 return await db.execute(select(self.__model__).filter(self.__model__.id.in_(ids))).fetchall()
             except NoResultFound as e:
                 if args:
@@ -100,14 +91,11 @@ class BaseRepository(object):
             except ProgrammingError as e:
                 logger.exception(f'{self.__model__.__name__} error: {e}')
                 raise e
-            finally:
-                await get_async_sessionmaker().cached_engine.dispose()
 
     async def get_paged_items(self, pageable, params):
         async with get_async_db() as db:
             try:
                 data = []
-                # total_count = db.query(self.__model__).filter_by(**params).count()
                 execute = await db.execute(select(func.count()).select_from(self.__model__).filter_by(**params))
                 total_count = execute.scalar()
                 if total_count > 0:
@@ -125,5 +113,3 @@ class BaseRepository(object):
             except ProgrammingError as e:
                 logger.exception(f'{self.__model__.__name__} error: {e}')
                 raise e
-            finally:
-                await get_async_sessionmaker().cached_engine.dispose()

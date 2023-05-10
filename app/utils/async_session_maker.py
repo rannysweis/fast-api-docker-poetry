@@ -1,5 +1,5 @@
 from contextlib import asynccontextmanager
-from typing import Iterator, Optional
+from typing import Optional, AsyncIterator
 
 from sqlalchemy import AsyncAdaptedQueuePool
 from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker, create_async_engine, AsyncSession
@@ -69,7 +69,7 @@ class AsyncSessionMaker:
         engine = engine or self.cached_engine
         return get_sessionmaker_for_engine(engine)
 
-    def get_db(self) -> Iterator[AsyncSession]:
+    def get_db(self) -> AsyncIterator[AsyncSession]:
         """
         A generator function that yields a sqlalchemy orm session and cleans up the session once resumed after yielding.
 
@@ -78,7 +78,7 @@ class AsyncSessionMaker:
         yield from _get_db(self.cached_sessionmaker)
 
     @asynccontextmanager
-    def context_session(self) -> Iterator[AsyncSession]:
+    def context_session(self) -> AsyncIterator[AsyncSession]:
         """
         A context-manager wrapped version of the `get_db` method.
 
@@ -117,7 +117,7 @@ def get_sessionmaker_for_engine(engine: AsyncEngine) -> async_sessionmaker:
 
 
 @asynccontextmanager
-def context_session(engine: AsyncEngine) -> Iterator[AsyncSession]:
+def context_session(engine: AsyncEngine) -> AsyncIterator[AsyncSession]:
     """
     This contextmanager yields a managed session for the provided engine.
 
@@ -130,7 +130,7 @@ def context_session(engine: AsyncEngine) -> Iterator[AsyncSession]:
     yield from _get_db(sessionmaker)
 
 
-def _get_db(sessionmaker: async_sessionmaker) -> Iterator[AsyncSession]:
+def _get_db(sessionmaker: async_sessionmaker) -> AsyncIterator[AsyncSession]:
     """
     A generator function that yields an ORM session using the provided sessionmaker, and cleans it up when resumed.
     """
