@@ -13,11 +13,11 @@ settings: Settings = get_settings()
 
 def get_async_db() -> AsyncIterator[AsyncSession]:
     """FastAPI dependency that provides a sqlalchemy session"""
-    return _get_async_sessionmaker().cached_sessionmaker()
+    return get_async_sessionmaker().cached_sessionmaker()
 
 
 @lru_cache()
-def _get_async_sessionmaker() -> AsyncSessionMaker:
+def get_async_sessionmaker() -> AsyncSessionMaker:
     url = get_database_settings().async_url
 
     return AsyncSessionMaker(url)
@@ -26,5 +26,5 @@ def _get_async_sessionmaker() -> AsyncSessionMaker:
 def shutdown() -> None:
     logger.info("Shutting down database connections")
 
-    _get_async_sessionmaker().cached_engine.dispose()
+    get_async_sessionmaker().cached_engine.dispose()
 

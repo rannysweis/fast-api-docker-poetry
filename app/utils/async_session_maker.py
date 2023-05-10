@@ -1,7 +1,7 @@
-from contextlib import contextmanager
+from contextlib import asynccontextmanager
 from typing import Iterator, Optional
 
-from sqlalchemy import NullPool
+from sqlalchemy import AsyncAdaptedQueuePool
 from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker, create_async_engine, AsyncSession
 
 """
@@ -77,7 +77,7 @@ class AsyncSessionMaker:
         """
         yield from _get_db(self.cached_sessionmaker)
 
-    @contextmanager
+    @asynccontextmanager
     def context_session(self) -> Iterator[AsyncSession]:
         """
         A context-manager wrapped version of the `get_db` method.
@@ -104,7 +104,7 @@ def get_engine(uri: str) -> AsyncEngine:
 
     This function may be updated over time to reflect recommended engine configuration for use with FastAPI.
     """
-    return create_async_engine(uri, pool_pre_ping=True, poolclass=NullPool)
+    return create_async_engine(uri, pool_pre_ping=True, poolclass=AsyncAdaptedQueuePool)
 
 
 def get_sessionmaker_for_engine(engine: AsyncEngine) -> async_sessionmaker:
@@ -113,10 +113,10 @@ def get_sessionmaker_for_engine(engine: AsyncEngine) -> async_sessionmaker:
 
     This function may be updated over time to reflect recommended sessionmaker configuration for use with FastAPI.
     """
-    return async_sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    return async_sessionmaker(bind=engine, expire_on_commit=False)
 
 
-@contextmanager
+@asynccontextmanager
 def context_session(engine: AsyncEngine) -> Iterator[AsyncSession]:
     """
     This contextmanager yields a managed session for the provided engine.

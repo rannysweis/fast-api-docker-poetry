@@ -5,7 +5,7 @@ from sqlalchemy.exc import NoResultFound
 
 from app.models.order import OrderOrm
 from app.repository.base_repository import BaseRepository
-from app.utils.async_db import get_async_db
+from app.utils.async_db import get_async_db, get_async_sessionmaker
 
 logger = logging.getLogger(__name__)
 
@@ -25,3 +25,5 @@ class OrderRepository(BaseRepository):
             except NoResultFound as e:
                 logger.exception(f'{self.__model__.__name__} not found with address id: {id}')
                 raise e
+            finally:
+                await get_async_sessionmaker().cached_engine.dispose()

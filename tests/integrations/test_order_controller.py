@@ -1,3 +1,9 @@
+import asyncio
+import concurrent
+import time
+from asyncio import create_task
+from concurrent.futures import ThreadPoolExecutor
+
 import pytest
 from httpx import AsyncClient
 
@@ -42,9 +48,7 @@ def assert_valid_order(address_dict, response):
     assert pickup_address["longitude"] == address_dict["longitude"]
 
 
-pytestmark = pytest.mark.asyncio
-
-
+@pytest.mark.asyncio
 class TestOrderController:
     async def test_create_order(self, async_client: AsyncClient):
         address_dict = get_address_dict()
@@ -131,13 +135,22 @@ class TestOrderController:
         assert order_id == response2.json()["id"]
         assert response2.json()["name"] == "iphone"
 
+    async def post_order(self, client, order_dict):
+        await client.post("/order", json=order_dict)
+
     async def test_list_order(self, async_client: AsyncClient):
         address_dict = get_address_dict()
         order_dict = get_order_dict(address_dict)
-
-        for i in range(10):
-            order_dict["name"] = f"order {i}"
+        # start_time = time.perf_counter()
+        for _ in range(10):
             await async_client.post("/order", json=order_dict)
+        # tasks = [create_task(self.post_order(async_client, order_dict)) for _ in range(10)]
+        # done, pending = await asyncio.wait(tasks, timeout=1)
+        # for task in pending:
+        #     task.cancel()
+        # for task in done:
+        #     task.result()
+        # end_time = time.perf_counter()
 
         response = await async_client.get(f"/orders?page=1&size=6&sort=name&direction=ASC")
 
@@ -148,10 +161,7 @@ class TestOrderController:
     async def test_list_order_error(self, async_client: AsyncClient):
         address_dict = get_address_dict()
         order_dict = get_order_dict(address_dict)
-
-        for i in range(10):
-            order_dict["name"] = f"order {i}"
-            await async_client.post("/order", json=order_dict)
+        await async_client.post("/order", json=order_dict)
 
         response = await async_client.get(f"/orders?page=1&size=6&sort=test&direction=ASC")
 
