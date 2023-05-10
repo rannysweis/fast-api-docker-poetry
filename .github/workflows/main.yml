@@ -1,0 +1,21 @@
+name: Run tests
+
+on:
+  push:
+    branches:
+      - '*'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Build and run containers
+      run: |
+        docker-compose up -d --build
+
+    - name: Run tests
+      run: |
+        docker-compose run --rm fast-api-docker-poetry poetry run pytest -v --durations=10 --durations-min=0.5
