@@ -2,7 +2,7 @@ import math
 from typing import List, Optional, Literal, Any
 
 from pydantic import BaseModel
-from sqlalchemy.orm import Query
+from sqlalchemy.orm import InstrumentedAttribute
 
 
 class PageRequestSchema(BaseModel):
@@ -15,7 +15,7 @@ class PageRequestSchema(BaseModel):
     def offset(self):
         return (self.page - 1) * self.size
 
-    def sql_sort(self, sort):
+    def sql_sort(self, sort: InstrumentedAttribute):
         return sort.asc() if self.direction == "ASC" else sort.desc()
 
 

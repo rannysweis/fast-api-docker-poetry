@@ -24,5 +24,8 @@ class OrderService:
         order.price = updated_order.price
         return await self.order_repo.save(order)
 
+    async def delete_order(self, order_id: int):
+        return await self.order_repo.delete_by_id(order_id)
+
     async def get_paged_orders(self, pageable: PageRequestSchema) -> Tuple[List, int]:
         return await self.order_repo.get_paged_items(pageable, {})

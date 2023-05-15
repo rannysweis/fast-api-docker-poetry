@@ -1,11 +1,10 @@
 import asyncio
-import concurrent
 import time
 from asyncio import create_task
-from concurrent.futures import ThreadPoolExecutor
 
-import pytest
 from httpx import AsyncClient
+
+from app.repository.order_repository import OrderRepository
 
 
 def get_address_dict():
@@ -48,7 +47,6 @@ def assert_valid_order(address_dict, response):
     assert pickup_address["longitude"] == address_dict["longitude"]
 
 
-@pytest.mark.asyncio
 class TestOrderController:
     async def test_create_order(self, async_client: AsyncClient):
         address_dict = get_address_dict()
@@ -135,6 +133,17 @@ class TestOrderController:
         assert order_id == response2.json()["id"]
         assert response2.json()["name"] == "iphone"
 
+    async def test_delete_order(self, async_client: AsyncClient):
+        address_dict = get_address_dict()
+        order_dict = get_order_dict(address_dict)
+        response = await async_client.post("/order", json=order_dict)
+        order_id = response.json()["id"]
+
+        response2 = await async_client.delete(f"/order/{order_id}")
+
+        assert response2.status_code == 204
+        assert not await OrderRepository().get_by_id(order_id, None)
+
     async def post_order(self, client, order_dict):
         await client.post("/order", json=order_dict)
 
@@ -143,11 +152,7 @@ class TestOrderController:
         order_dict = get_order_dict(address_dict)
         start_time = time.perf_counter()
         tasks = [create_task(self.post_order(async_client, order_dict)) for _ in range(10)]
-        done, pending = await asyncio.wait(tasks, timeout=1)
-        for task in pending:
-            task.cancel()
-        for task in done:
-            task.result()
+        await asyncio.gather(*tasks)
         end_time = time.perf_counter()
 
         response = await async_client.get(f"/orders?page=1&size=6&sort=name&direction=ASC")

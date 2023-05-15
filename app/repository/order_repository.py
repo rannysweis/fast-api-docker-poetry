@@ -14,10 +14,10 @@ class OrderRepository(BaseRepository):
         super().__init__(OrderOrm)
 
     async def get_by_address_id(self, address_id):
-        async with self.async_db as db:
+        async with self.session_maker as session:
             try:
                 clause = or_(OrderOrm.pickup_id == address_id, OrderOrm.dropoff_id == address_id)
-                result = await db.execute(select(self.__model__).filter(clause))
+                result = await session.execute(select(self.__model__).filter(clause))
                 return result.one()[0]
             except NoResultFound as e:
                 logger.exception(f'{self.__model__.__name__} not found with address id: {id}')

@@ -8,19 +8,13 @@ import pytest
 import pytest_asyncio
 from fastapi import FastAPI
 from httpx import AsyncClient
-from starlette.testclient import TestClient
 
 from app.main import create_application
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def app() -> FastAPI:
     return create_application()
-
-
-@pytest.fixture
-def client(app: FastAPI) -> TestClient:
-    return TestClient(app)
 
 
 @pytest_asyncio.fixture

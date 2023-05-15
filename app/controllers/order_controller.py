@@ -2,7 +2,7 @@ from typing import List
 
 from fastapi import Depends, APIRouter
 from fastapi_restful.cbv import cbv
-from starlette.status import HTTP_201_CREATED
+from starlette.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT
 
 from app.models.order import OrderSchema, OrderOrm
 from app.models.pageable import PageRequestSchema, PageResponseSchema
@@ -35,6 +35,10 @@ class OrderController:
         order_orm: OrderOrm = order.to_orm()  # convert pydantic to sqlalchemy
 
         return await self.order_service.update_order(order_id, order_orm)
+
+    @order_router.delete("/order/{order_id}", operation_id="delete_order_delete", status_code=HTTP_204_NO_CONTENT)
+    async def delete_order(self, order_id: int):
+        await self.order_service.delete_order(order_id)
 
     @order_router.get("/orders", operation_id="list_orders_get")
     async def list_orders(self, pageable: PageRequestSchema = Depends()) -> PageResponseSchema:

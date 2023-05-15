@@ -4,7 +4,6 @@ import pytest
 from httpx import AsyncClient
 
 
-@pytest.mark.asyncio
 class TestTestController:
     async def test_concurrent_requests(self, async_client: AsyncClient):
         tested = False

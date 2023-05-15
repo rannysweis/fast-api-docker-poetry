@@ -1,5 +1,3 @@
-from typing import Dict
-
 from fastapi import status, APIRouter
 from fastapi.responses import JSONResponse
 from fastapi_restful.cbv import cbv
@@ -11,7 +9,7 @@ system_router = APIRouter()
 class SystemController:
 
     @system_router.get("/", include_in_schema=False)
-    async def root(self) -> Dict[str, str]:
+    async def root(self) -> dict[str, str]:
         """Display welcome message."""
         return {"message": "Hello World!"}
 

@@ -12,7 +12,6 @@ authors = ["Ranny Sweis"]
 python = "^3.9"
 fastapi = "^0.95.1"
 uvicorn = "^0.18.2"
-requests = "^2.28.1"
 python-multipart = "^0.0.5"
 alembic = "^1.10.4"
 python-ulid = "^1.1.0"
@@ -37,6 +36,7 @@ line-length = 100
 target-version = ['py310']
 
 [tool.pytest.ini_options]
+asyncio_mode = "auto"
 testpaths = [
     "tests"
 ]

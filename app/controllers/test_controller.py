@@ -1,5 +1,4 @@
 import asyncio
-from typing import Dict
 
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
@@ -12,7 +11,7 @@ test_router = APIRouter()
 class TestController:
 
     @test_router.get("/test/sleep", include_in_schema=False)
-    async def sleep_test(self) -> Dict[str, str]:
+    async def sleep_test(self) -> dict[str, str]:
         await asyncio.sleep(1)
         return {"message": "Hello World!"}
 
