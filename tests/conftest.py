@@ -39,5 +39,7 @@ def run_migrations() -> None:
     """
     shutdown is needed to avoid this issue:
     got Future <Future pending cb=[Protocol._on_waiter_completed()]> attached to a different loop
+    
+    https://docs.sqlalchemy.org/en/20/orm/extensions/asyncio.html#using-multiple-asyncio-event-loops
     """
     asyncio.run(db_session.shutdown())

@@ -1,4 +1,4 @@
-import asyncpg
+import psycopg2
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from httpx import HTTPError
@@ -45,7 +45,7 @@ def create_application() -> FastAPI:
     async def initialize():
         print(f"Connecting to postgres...")
         dsn = get_database_settings().url
-        conn = await asyncpg.connect(dsn)
+        conn = psycopg2.connect(dsn)
         cur = conn.cursor()
         cur.execute("SELECT 1;")
         cur.close()

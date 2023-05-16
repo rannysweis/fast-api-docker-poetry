@@ -1,3 +1,5 @@
+from contextlib import asynccontextmanager
+
 from sqlalchemy import AsyncAdaptedQueuePool
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine, AsyncSession
 
@@ -12,16 +14,11 @@ engine = create_async_engine(async_url,
 sessionmaker = async_sessionmaker(bind=engine, expire_on_commit=False)
 
 
+@asynccontextmanager
 async def get_db_session() -> AsyncSession:
     session = sessionmaker()
-    try:
+    async with session.begin():
         yield session
-        await session.commit()
-    except Exception as exc:
-        await session.rollback()
-        raise exc
-    finally:
-        await session.close()
 
 
 async def shutdown() -> None:

@@ -2,9 +2,7 @@ import asyncio
 import time
 from asyncio import create_task
 
-from fastapi import background
 from httpx import AsyncClient
-from starlette.background import BackgroundTasks
 
 from app.repository.order_repository import OrderRepository
 
@@ -50,10 +48,13 @@ def assert_valid_order(address_dict, response):
 
 
 class TestOrderController:
-    """
-    WARNING if test_list_order is not first it will hang when trying to run `asyncio.gather` I have no idea why
-    """
+    async def post_order(self, client, order_dict):
+        await client.post("/order", json=order_dict)
+
     async def test_list_order(self, async_client: AsyncClient):
+        """
+            WARNING if test_list_order is not first it will hang when trying to run `asyncio.gather` I have no idea why
+        """
         address_dict = get_address_dict()
         order_dict = get_order_dict(address_dict)
         start_time = time.perf_counter()
@@ -67,6 +68,19 @@ class TestOrderController:
         assert response.status_code == 200
         assert len(response.json()["data"]) == 6
         assert response.json()["total_count"] == 50
+
+    async def test_list_order_error(self, async_client: AsyncClient):
+        address_dict = get_address_dict()
+        order_dict = get_order_dict(address_dict)
+        await async_client.post("/order", json=order_dict)
+
+        response = await async_client.get(f"/orders?page=1&size=6&sort=test&direction=ASC")
+
+        assert response.status_code == 422
+        assert response.json()["errors"] == [{
+            'title': 'Attribute Error',
+            'msg': "type object 'OrderOrm' has no attribute 'test'"
+        }]
 
     async def test_create_order(self, async_client: AsyncClient):
         address_dict = get_address_dict()
@@ -163,19 +177,3 @@ class TestOrderController:
 
         assert response2.status_code == 204
         assert not await OrderRepository().get_by_id(order_id, None)
-
-    async def post_order(self, client, order_dict):
-        await client.post("/order", json=order_dict)
-
-    async def test_list_order_error(self, async_client: AsyncClient):
-        address_dict = get_address_dict()
-        order_dict = get_order_dict(address_dict)
-        await async_client.post("/order", json=order_dict)
-
-        response = await async_client.get(f"/orders?page=1&size=6&sort=test&direction=ASC")
-
-        assert response.status_code == 422
-        assert response.json()["errors"] == [{
-            'title': 'Attribute Error',
-            'msg': "type object 'OrderOrm' has no attribute 'test'"
-        }]

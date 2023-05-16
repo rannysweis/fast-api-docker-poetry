@@ -5,6 +5,7 @@ from sqlalchemy.exc import NoResultFound
 
 from app.models.order import OrderOrm
 from app.repository.base_repository import BaseRepository
+from app.utils.db_session import get_db_session
 
 logger = logging.getLogger(__name__)
 
@@ -14,7 +15,7 @@ class OrderRepository(BaseRepository):
         super().__init__(OrderOrm)
 
     async def get_by_address_id(self, address_id):
-        async with self.session_maker() as session:
+        async with get_db_session() as session:
             try:
                 clause = or_(OrderOrm.pickup_id == address_id, OrderOrm.dropoff_id == address_id)
                 result = await session.execute(select(self.__model__).filter(clause))
