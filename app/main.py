@@ -1,15 +1,17 @@
+import psycopg2
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
+from httpx import HTTPError
 from pydantic import ValidationError
-from requests import HTTPError
 from sqlalchemy.exc import IntegrityError, ProgrammingError, NoResultFound
 from starlette.exceptions import HTTPException
 
 from app.config import exception_config as exh
-from app.config.settings import Environment, get_settings
+from app.config.settings import Environment, get_settings, get_database_settings
 from app.controllers.order_controller import order_router
 from app.controllers.system_controller import system_router
-from app.utils import db
+from app.controllers.test_controller import test_router
+from app.utils import db_session
 
 settings = get_settings()
 
@@ -36,13 +38,23 @@ def create_application() -> FastAPI:
     application.include_router(system_router)
     application.include_router(order_router)
 
+    if settings.is_local_dev:
+        application.include_router(test_router)
+
     @application.on_event("startup")
     async def initialize():
-        db.wait_for_postgres()
+        print(f"Connecting to postgres...")
+        dsn = get_database_settings().url
+        conn = psycopg2.connect(dsn)
+        cur = conn.cursor()
+        cur.execute("SELECT 1;")
+        cur.close()
+        conn.close()
+        print(f"Successfully connected to postgres...")
 
     @application.on_event("shutdown")
     async def shutdown():
-        db.shutdown()
+        await db_session.shutdown()
 
     return application
 

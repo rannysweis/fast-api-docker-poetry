@@ -30,18 +30,7 @@
           def __init__(self):
               self.order_service = OrderService()
    ```
-4. Log and raise original DB exceptions
-   ```
-      try:
-          ...
-      except IntegrityError as e:
-          logger.exception(f'{self.__model__.__name__} error: {e.orig}')
-          raise e
-      except ProgrammingError as e:
-          logger.exception(f'{self.__model__.__name__} error: {e}')
-          raise e
-   ```
-5. Model files has ORM and pydantic classes for easier updates (Might not be the best solution for all)
+4. Model files has ORM and pydantic classes for easier updates (Might not be the best solution for all)
    - Schema - request/response object. It uses `BaseSchema.to_orm` to convert to ORM
    - ORM - DB object
 

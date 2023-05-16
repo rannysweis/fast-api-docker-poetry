@@ -87,7 +87,6 @@ async def unhandled_exception_handler(request: Request, exc):
 
 
 async def attribute_error_handler(request, exc):
-    # Note: These do not need to be sent to Rollbar
     return JSONResponse(
         status_code=HTTP_422_UNPROCESSABLE_ENTITY,
         content=jsonable_encoder(

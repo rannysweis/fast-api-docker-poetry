@@ -4,7 +4,7 @@ startd:
 
 testd:
 	docker-compose up -d --build \
-		&& docker-compose run --rm fast-api-docker-poetry poetry run pytest -v
+		&& docker-compose run --rm fast-api-docker-poetry poetry run pytest -v --durations=10 --durations-min=0.5
 
 startp:
 	docker-compose up fast-api-postgres -d --build \
@@ -13,7 +13,7 @@ startp:
 
 testp:
 	docker-compose up fast-api-postgres -d --build \
-	&& poetry run pytest -v
+	&& poetry run pytest -v --durations=10 --durations-min=0.5
 
 create-migration: ## Create an alembic migration
 	@read -p "Enter rev id: " message; \

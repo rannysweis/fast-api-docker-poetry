@@ -12,15 +12,15 @@ authors = ["Ranny Sweis"]
 python = "^3.9"
 fastapi = "^0.95.1"
 uvicorn = "^0.18.2"
-requests = "^2.28.1"
 python-multipart = "^0.0.5"
-httpx = "^0.24.0"
 alembic = "^1.10.4"
 python-ulid = "^1.1.0"
-psycopg2-binary = "^2.9.6"
 backoff = "^2.2.1"
 fastapi-restful = "^0.4.3"
 sqlalchemy = "^2.0.12"
+httpx = "^0.24.0"
+asyncpg = "^0.27.0"
+psycopg2-binary = "^2.9.6"
 
 [tool.poetry.dev-dependencies]
 black = "^22.6.0"
@@ -29,12 +29,14 @@ pre-commit = "^2.19.0"
 pytest = "^7.1.2"
 pytest-cov = "^3.0.0"
 types-PyYAML = "^6.0.9"
+pytest-asyncio = "^0.21.0"
 
 [tool.black]
 line-length = 100
 target-version = ['py310']
 
 [tool.pytest.ini_options]
+asyncio_mode = "auto"
 testpaths = [
     "tests"
 ]

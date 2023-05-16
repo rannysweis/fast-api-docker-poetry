@@ -9,20 +9,23 @@ class OrderService:
     def __init__(self):
         self.order_repo: OrderRepository = OrderRepository()
 
-    def create_order(self, order: OrderOrm) -> OrderOrm:
-        return self.order_repo.save(order)
+    async def create_order(self, order: OrderOrm) -> OrderOrm:
+        return await self.order_repo.save(order)
 
-    def get_order(self, order_id: str) -> OrderOrm:
-        return self.order_repo.get_by_id(order_id)
+    async def get_order(self, order_id: int) -> OrderOrm:
+        return await self.order_repo.get_by_id(order_id)
 
-    def get_order_by_address_id(self, address_id: str) -> OrderOrm:
-        return self.order_repo.get_by_address_id(address_id)
+    async def get_order_by_address_id(self, address_id: int) -> OrderOrm:
+        return await self.order_repo.get_by_address_id(address_id)
 
-    def update_order(self, order_id: str, updated_order: OrderOrm):
-        order: OrderOrm = self.order_repo.get_by_id(order_id)
+    async def update_order(self, order_id: int, updated_order: OrderOrm):
+        order: OrderOrm = await self.order_repo.get_by_id(order_id)
         order.name = updated_order.name
         order.price = updated_order.price
-        return self.order_repo.save(order)
+        return await self.order_repo.save(order)
 
-    def get_paged_orders(self, pageable: PageRequestSchema) -> Tuple[List, int]:
-        return self.order_repo.get_paged_items(pageable, {})
+    async def delete_order(self, order_id: int):
+        return await self.order_repo.delete_by_id(order_id)
+
+    async def get_paged_orders(self, pageable: PageRequestSchema) -> Tuple[List, int]:
+        return await self.order_repo.get_paged_items(pageable, {})
