@@ -14,7 +14,7 @@ class OrderRepository(BaseRepository):
         super().__init__(OrderOrm)
 
     async def get_by_address_id(self, address_id):
-        async with self.session_maker as session:
+        async with self.session_maker() as session:
             try:
                 clause = or_(OrderOrm.pickup_id == address_id, OrderOrm.dropoff_id == address_id)
                 result = await session.execute(select(self.__model__).filter(clause))

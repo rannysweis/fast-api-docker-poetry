@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import os
 
@@ -10,6 +11,7 @@ from fastapi import FastAPI
 from httpx import AsyncClient
 
 from app.main import create_application
+from app.utils import db_session
 
 
 @pytest.fixture(scope="session")
@@ -34,3 +36,8 @@ def run_migrations() -> None:
     alembic.command.upgrade(cfg, "head")
     yield
     alembic.command.downgrade(cfg, "base")
+    """
+    shutdown is needed to avoid this issue:
+    got Future <Future pending cb=[Protocol._on_waiter_completed()]> attached to a different loop
+    """
+    asyncio.run(db_session.shutdown())

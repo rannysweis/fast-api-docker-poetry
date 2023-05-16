@@ -11,6 +11,7 @@ from app.config.settings import Environment, get_settings, get_database_settings
 from app.controllers.order_controller import order_router
 from app.controllers.system_controller import system_router
 from app.controllers.test_controller import test_router
+from app.utils import db_session
 
 settings = get_settings()
 
@@ -51,9 +52,9 @@ def create_application() -> FastAPI:
         conn.close()
         print(f"Successfully connected to postgres...")
 
-    # @application.on_event("shutdown")
-    # async def shutdown():
-    #     db.shutdown()
+    @application.on_event("shutdown")
+    async def shutdown():
+        await db_session.shutdown()
 
     return application
 
