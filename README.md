@@ -33,6 +33,7 @@
 4. Model files has ORM and pydantic classes for easier updates (Might not be the best solution for all)
    - Schema - request/response object. It uses `BaseSchema.to_orm` to convert to ORM
    - ORM - DB object
+5. Here is the [commit](https://github.com/rannysweis/fast-api-docker-poetry/tree/3a075badcf27b7a0e42fb5cc971492fcb7c82d23) before switching to async 
 
 
 
