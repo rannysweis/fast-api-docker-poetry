@@ -36,7 +36,7 @@ services:
       - "16686:16686" # Jaeger UI
       - "4317:4317" # OTLP gRPC
     environment:
-      COLLECTOR_OTLP_ENABLED: true
+      COLLECTOR_OTLP_ENABLED: "true"
       LOG_LEVEL: debug
 
 
