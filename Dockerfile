@@ -49,6 +49,7 @@ USER appuser
 WORKDIR $PYSETUP_PATH
 COPY ./pyproject.toml ./poetry.lock ./
 RUN poetry install
+RUN opentelemetry-bootstrap --action=install
 
 WORKDIR /home/appuser
 
@@ -57,7 +58,7 @@ RUN chmod +x scripts/*
 
 EXPOSE 8009
 ENTRYPOINT ["/home/appuser/scripts/docker-entrypoint.sh"]
-CMD ["python", "-m", "app.main"]
+CMD ["opentelemetry-instrument", "python", "-m", "app.main"]
 
 # ------------------------------------------------------------------------------------
 # 'release' stage uses the clean 'python-base' stage and copies
@@ -74,4 +75,4 @@ RUN chmod +x scripts/*
 
 EXPOSE 8009
 ENTRYPOINT ["/home/appuser/scripts/docker-entrypoint.sh"]
-CMD ["python", "-m", "app.main"]
+CMD ["opentelemetry-instrument", "python", "-m", "app.main"]
