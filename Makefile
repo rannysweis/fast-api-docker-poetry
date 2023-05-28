@@ -3,7 +3,7 @@ startd:
 		&& docker-compose run --rm fast-api-docker-poetry poetry run alembic upgrade head
 
 testd:
-	docker-compose up -d --build \
+	docker-compose -f docker-compose.test.yml up -d --build \
 		&& docker-compose run --rm fast-api-docker-poetry poetry run pytest -v --durations=10 --durations-min=0.5
 
 startp:

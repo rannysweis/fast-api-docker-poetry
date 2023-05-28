@@ -8,7 +8,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      target: ${TARGET:-development}
+      target: ${TARGET:-test}
     environment:
       POSTGRES_DB_HOST: postgresql
       OTEL_SERVICE_NAME: fastApiDockerPoetry
@@ -20,10 +20,8 @@ services:
       - ./tests:/home/appuser/tests
     depends_on:
       - fast-api-postgres
-      - jaeger
     links:
       - fast-api-postgres:postgresql
-      - jaeger:jaeger
 
   fast-api-postgres:
     image: postgres:15-alpine
@@ -35,15 +33,6 @@ services:
       POSTGRES_DB: fastapi_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-
-  jaeger:
-    image: jaegertracing/all-in-one:latest
-    ports:
-      - "16686:16686" # Jaeger UI
-      - "4317:4317" # OTLP gRPC
-    environment:
-      COLLECTOR_OTLP_ENABLED: "true"
-      LOG_LEVEL: debug
 
 
 
