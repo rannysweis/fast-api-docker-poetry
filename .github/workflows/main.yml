@@ -14,7 +14,7 @@ jobs:
 
     - name: Build and run containers
       run: |
-        docker-compose up -d --build
+        docker-compose -f docker-compose.test.yml up -d --build
 
     - name: Run tests
       run: |
