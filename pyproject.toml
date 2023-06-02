@@ -23,8 +23,7 @@ asyncpg = "^0.27.0"
 psycopg2-binary = "^2.9.6"
 opentelemetry-distro = "^0.39b0"
 opentelemetry-exporter-otlp = "^1.18.0"
-opentelemetry-instrumentation-fastapi = "^0.39b0"
-opentelemetry-exporter-jaeger = "^1.18.0"
+opentelemetry-contrib-instrumentations = "^0.39b0"
 
 [tool.poetry.dev-dependencies]
 black = "^22.6.0"

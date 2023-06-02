@@ -36,30 +36,6 @@ COPY ./pyproject.toml ./poetry.lock ./
 RUN poetry install --no-dev
 
 # ------------------------------------------------------------------------------------
-# 'test' stage installs all dev deps and can be used to develop code
-FROM python-base as test
-
-# Copy in the venv
-COPY --from=python-base --chown=appuser $POETRY_HOME $POETRY_HOME
-COPY --from=python-base --chown=appuser $PYSETUP_PATH $PYSETUP_PATH
-
-USER appuser
-
-# install dev libs
-WORKDIR $PYSETUP_PATH
-COPY ./pyproject.toml ./poetry.lock ./
-RUN poetry install
-
-WORKDIR /home/appuser
-
-COPY --chown=appuser . .
-RUN chmod +x scripts/*
-
-EXPOSE 8009
-ENTRYPOINT ["/home/appuser/scripts/docker-entrypoint.sh"]
-CMD ["python", "-m", "app.main"]
-
-# ------------------------------------------------------------------------------------
 # 'development' stage installs all dev deps and can be used to develop code
 FROM python-base as development
 
@@ -73,7 +49,6 @@ USER appuser
 WORKDIR $PYSETUP_PATH
 COPY ./pyproject.toml ./poetry.lock ./
 RUN poetry install
-RUN opentelemetry-bootstrap --action=install
 
 WORKDIR /home/appuser
 
@@ -92,8 +67,6 @@ FROM python-base as release
 COPY --from=python-base --chown=appuser $VENV_PATH $VENV_PATH
 
 USER appuser
-
-RUN opentelemetry-bootstrap --action=install
 
 WORKDIR /home/appuser
 

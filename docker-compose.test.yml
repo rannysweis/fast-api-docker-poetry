@@ -8,13 +8,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      target: ${TARGET:-test}
+      target: ${TARGET:-development}
     environment:
       POSTGRES_DB_HOST: postgresql
-      OTEL_SERVICE_NAME: fastApiDockerPoetry
-      OTEL_METRICS_EXPORTER: none
-      OTEL_TRACES_EXPORTER: otlp
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4317
+      APP_RELOAD: "true"
     volumes:
       - ./app:/home/appuser/app
       - ./tests:/home/appuser/tests

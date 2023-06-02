@@ -2,6 +2,7 @@ import psycopg2
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from httpx import HTTPError
+from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from pydantic import ValidationError
 from sqlalchemy.exc import IntegrityError, ProgrammingError, NoResultFound
 from starlette.exceptions import HTTPException
@@ -56,6 +57,8 @@ def create_application() -> FastAPI:
     async def shutdown():
         await db_session.shutdown()
 
+    # FastAPIInstrumentor.instrument_app(fast_api_app)
+
     return application
 
 
@@ -69,5 +72,5 @@ if __name__ == "__main__":
         port=settings.port,
         log_level=settings.log_level,
         access_log=True,
-        reload=settings.is_local_dev,
+        reload=settings.app_reload,  # has to be false for tracing to work
     )
