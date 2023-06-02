@@ -1,13 +1,16 @@
 startd:
+	docker-compose -f docker-compose.local.yml up -d --build \
+		&& docker-compose run --rm fast-api-docker-poetry poetry run alembic upgrade head
+
+stopd:
+	docker-compose -f docker-compose.local.yml down
+
+startslimd:
 	docker-compose up -d --build \
 		&& docker-compose run --rm fast-api-docker-poetry poetry run alembic upgrade head
 
-starttestd:
-	docker-compose -f docker-compose.test.yml up -d --build \
-		&& docker-compose run --rm fast-api-docker-poetry poetry run alembic upgrade head
-
 testd:
-	docker-compose -f docker-compose.test.yml up -d --build \
+	docker-compose up -d --build \
 		&& docker-compose run --rm fast-api-docker-poetry poetry run pytest -v --durations=10 --durations-min=0.5
 
 startp:

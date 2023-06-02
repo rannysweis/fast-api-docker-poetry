@@ -12,6 +12,7 @@ ENV PYTHONUNBUFFERED=1 \
     POETRY_VERSION=1.4.2
 
 ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:$PATH"
+ENV PYTHONPATH="${PYTHONPATH}:${PYSETUP_PATH}"
 RUN apk add bash libstdc++
 
 # create user
@@ -57,7 +58,7 @@ RUN chmod +x scripts/*
 
 EXPOSE 8009
 ENTRYPOINT ["/home/appuser/scripts/docker-entrypoint.sh"]
-CMD ["opentelemetry-instrument", "python", "-m", "app.main"]
+CMD ["python", "-m", "app.main"]
 
 # ------------------------------------------------------------------------------------
 # 'release' stage uses the clean 'python-base' stage and copies
@@ -75,4 +76,4 @@ RUN chmod +x scripts/*
 
 EXPOSE 8009
 ENTRYPOINT ["/home/appuser/scripts/docker-entrypoint.sh"]
-CMD ["opentelemetry-instrument", "python", "-m", "app.main"]
+CMD ["python", "-m", "app.main"]

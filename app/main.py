@@ -2,7 +2,6 @@ import psycopg2
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from httpx import HTTPError
-from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from pydantic import ValidationError
 from sqlalchemy.exc import IntegrityError, ProgrammingError, NoResultFound
 from starlette.exceptions import HTTPException
@@ -56,8 +55,6 @@ def create_application() -> FastAPI:
     @application.on_event("shutdown")
     async def shutdown():
         await db_session.shutdown()
-
-    # FastAPIInstrumentor.instrument_app(fast_api_app)
 
     return application
 

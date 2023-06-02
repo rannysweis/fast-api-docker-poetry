@@ -73,19 +73,23 @@ fast-api-docker-poetry
 
 ## Quick Start
 
-1. Start with docker
+1. Start with jaeger tracing using docker
     ```
     make startd
     ```
-2. Test with docker
+2. Start with no tracing using docker
+    ```
+    make startslimd
+    ```
+3. Test with docker
     ```
     make testd
     ```
-3. Start with poetry
+4. Start with poetry
     ```
     make startp
     ```
-4. Test with poetry
+5. Test with poetry
     ```
     make testp
     ```
