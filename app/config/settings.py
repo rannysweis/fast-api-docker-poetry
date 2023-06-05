@@ -39,6 +39,8 @@ class Settings(BaseSettings):
     log_level: str = "debug"
     app_reload: bool = False
     db_retry_window_seconds: int = 60
+    otel_service_name: str = None
+    otel_exporter_otlp_endpoint: str = None
 
     ALLOWED_CORS_ORIGINS: set = [
         "localhost",
