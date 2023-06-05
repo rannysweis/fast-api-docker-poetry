@@ -12,6 +12,7 @@ ENV PYTHONUNBUFFERED=1 \
     POETRY_VERSION=1.4.2
 
 ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:$PATH"
+ENV PYTHONPATH="${PYTHONPATH}:${PYSETUP_PATH}"
 RUN apk add bash libstdc++
 
 # create user
@@ -67,6 +68,7 @@ FROM python-base as release
 COPY --from=python-base --chown=appuser $VENV_PATH $VENV_PATH
 
 USER appuser
+
 WORKDIR /home/appuser
 
 COPY --chown=appuser . .

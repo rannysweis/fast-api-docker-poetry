@@ -36,8 +36,11 @@ class Settings(BaseSettings):
     service: str = "fast-api-docker-poetry"
     port: int = int("8009")
     host: str = "0.0.0.0"
-    log_level: str = "info"
+    log_level: str = "debug"
+    app_reload: bool = False
     db_retry_window_seconds: int = 60
+    otel_service_name: str = None
+    otel_exporter_otlp_endpoint: str = None
 
     ALLOWED_CORS_ORIGINS: set = [
         "localhost",

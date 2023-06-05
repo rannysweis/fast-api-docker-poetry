@@ -69,5 +69,5 @@ if __name__ == "__main__":
         port=settings.port,
         log_level=settings.log_level,
         access_log=True,
-        reload=settings.is_local_dev,
+        reload=settings.app_reload,  # has to be false for tracing to work
     )
