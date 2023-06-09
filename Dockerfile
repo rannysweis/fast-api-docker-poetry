@@ -1,4 +1,4 @@
-FROM python:3.11.3-alpine as python-base
+FROM python:3.11.3-slim-bullseye as python-base
 
 ENV PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=off \
@@ -13,23 +13,20 @@ ENV PYTHONUNBUFFERED=1 \
 
 ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:$PATH"
 ENV PYTHONPATH="${PYTHONPATH}:${PYSETUP_PATH}"
-RUN apk add bash libstdc++
+
+RUN apt-get update && apt-get upgrade -y
+RUN apt-get install --no-install-recommends -y curl
+
+#make lsb-release wget gnupg curl build-essential gcc libpq-dev
+#RUN apk add -y bash libstdc++ build-essential linux-headers-generic git gcc musl-dev python3-dev libffi-dev curl
 
 # create user
-RUN addgroup --gid 1000 -S appuser && adduser --uid 1000 -S appuser -G appuser
-
-RUN apk add bash \
-    build-base \
-    linux-headers \
-    git \
-    gcc  \
-    musl-dev  \
-    python3-dev  \
-    libffi-dev  \
-    openssl-dev \
-    curl
+RUN addgroup --gid 1000 appuser && adduser --uid 1000 --system --ingroup appuser appuser
 
 WORKDIR $PYSETUP_PATH
+
+RUN chown -R appuser /opt
+USER appuser
 
 # Install Poetry - respects $POETRY_VERSION & $POETRY_HOME
 RUN curl -sSL https://install.python-poetry.org | python3 -
@@ -39,12 +36,6 @@ RUN poetry install --no-dev
 # ------------------------------------------------------------------------------------
 # 'development' stage installs all dev deps and can be used to develop code
 FROM python-base as development
-
-# Copy in the venv
-COPY --from=python-base --chown=appuser $POETRY_HOME $POETRY_HOME
-COPY --from=python-base --chown=appuser $PYSETUP_PATH $PYSETUP_PATH
-
-USER appuser
 
 # install dev libs
 WORKDIR $PYSETUP_PATH
@@ -64,10 +55,6 @@ CMD ["python", "-m", "app.main"]
 # 'release' stage uses the clean 'python-base' stage and copies
 # in only our runtime deps that were installed in the 'python-base'
 FROM python-base as release
-
-COPY --from=python-base --chown=appuser $VENV_PATH $VENV_PATH
-
-USER appuser
 
 WORKDIR /home/appuser
 
