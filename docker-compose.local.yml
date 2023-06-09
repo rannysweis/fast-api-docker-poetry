@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   fast-api-docker-poetry:
-    image: local/fast-api-docker-poetry:${BUILD_TAG:-local-dev}
+    image: local/fast-api-server:${BUILD_TAG:-local-dev}
     ports:
       - "8009:8009"
     build:
