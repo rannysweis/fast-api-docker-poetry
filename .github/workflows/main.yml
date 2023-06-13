@@ -29,9 +29,11 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           docker buildx create --use
+          echo $DOCKER_TOKEN | docker login -u $DOCKER_USER --password-stdin
           docker buildx build --push -t fast-api-server .
         env:
           DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+          DOCKER_USER: ${{ secrets.DOCKER_USER }}
 
   test:
     needs: build
