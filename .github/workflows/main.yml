@@ -41,7 +41,7 @@ jobs:
 
       - name: Run containers
         run: |
-          docker-compose up -d
+          docker-compose up --build -d
         env:
           IMAGE_NAME: ${{ secrets.DOCKER_USER }}/fast-api-server:${{ hashFiles('**/Dockerfile') }}
 
