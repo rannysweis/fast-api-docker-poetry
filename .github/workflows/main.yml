@@ -6,7 +6,7 @@ on:
       - '*'
 
 jobs:
-  build:
+  build-test:
     runs-on: ubuntu-latest
 
     steps:
@@ -21,9 +21,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: /var/lib/docker
-          key: ${{ runner.os }}-docker-${{ hashFiles('**/Dockerfile') }}
+          key: fast-api-server-${{ hashFiles('**/Dockerfile') }}
           restore-keys: |
-            ${{ runner.os }}-docker-
+            fast-api-server-
 
       - name: Build and push Docker image
         if: steps.cache.outputs.cache-hit != 'true'
@@ -35,14 +35,6 @@ jobs:
           DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
           DOCKER_USER: ${{ secrets.DOCKER_USER }}
 
-  test:
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-        
       - name: Build and run containers
         run: |
           docker-compose up -d
