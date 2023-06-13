@@ -6,16 +6,37 @@ on:
       - '*'
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-    - name: Build and run containers
-      run: |
-        docker-compose up -d --build
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
 
-    - name: Run tests
-      run: |
-        docker-compose run --rm fast-api-docker-poetry poetry run pytest -v --durations=10 --durations-min=0.5
+      - name: Cache Docker image
+        id: cache
+        uses: actions/cache@v2
+        with:
+          path: /var/lib/docker
+          key: ${{ runner.os }}-docker-${{ hashFiles('**/Dockerfile') }}
+          restore-keys: |
+            ${{ runner.os }}-docker-
+
+      - name: Build and push Docker image
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          docker buildx create --use
+          docker buildx build --push --platform linux/amd64,linux/arm64 -t fast-api-server .
+
+  test:
+    runs-on: ubuntu-latest
+      - name: Build and run containers
+        run: |
+          docker-compose up -d
+
+      - name: Run tests
+        run: |
+          docker-compose run --rm fast-api-docker-poetry poetry run pytest -v --durations=10 --durations-min=0.5
