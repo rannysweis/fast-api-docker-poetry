@@ -41,13 +41,14 @@ jobs:
 
       - name: Run containers
         run: |
-          docker-compose up -e IMAGE_NAME=$DOCKER_USER/fast-api-server:${{ hashFiles('**/Dockerfile') }} -d
+          docker-compose up -d
         env:
-          DOCKER_USER: ${{ secrets.DOCKER_USER }}
+          IMAGE_NAME: ${{ secrets.DOCKER_USER }}/fast-api-server:${{ hashFiles('**/Dockerfile') }}
+
 
       - name: Run tests
         run: |
-          docker-compose run --rm -e IMAGE_NAME=$DOCKER_USER/fast-api-server:${{ hashFiles('**/Dockerfile') }} fast-api-docker-poetry poetry run pytest -v --durations=10 --durations-min=0.5
+          docker-compose run --rm fast-api-docker-poetry poetry run pytest -v --durations=10 --durations-min=0.5
         env:
-          DOCKER_USER: ${{ secrets.DOCKER_USER }}
+          IMAGE_NAME: ${{ secrets.DOCKER_USER }}/fast-api-server:${{ hashFiles('**/Dockerfile') }}
 
