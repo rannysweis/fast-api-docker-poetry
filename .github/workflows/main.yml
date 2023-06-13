@@ -37,7 +37,9 @@ jobs:
 
       - name: Run containers
         run: |
-          docker-compose up -d
+          docker-compose up -e IMAGE_NAME=$DOCKER_USER/fast-api-server:latest -d
+        env:
+          DOCKER_USER: ${{ secrets.DOCKER_USER }}
 
       - name: Run tests
         run: |

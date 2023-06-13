@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   fast-api-docker-poetry:
-    image: ${DOCKER_USER:local}/fast-api-server:latest
+    image: ${IMAGE_NAME}
     ports:
       - "8009:8009"
     build:
