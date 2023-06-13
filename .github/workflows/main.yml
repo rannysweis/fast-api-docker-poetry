@@ -20,7 +20,7 @@ jobs:
         id: cache
         uses: actions/cache@v3
         with:
-          path: /var/lib/docker
+#          path: /var/lib/docker
           key: fast-api-server-${{ hashFiles('**/Dockerfile') }}
           restore-keys: |
             fast-api-server-
@@ -35,7 +35,7 @@ jobs:
           DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
           DOCKER_USER: ${{ secrets.DOCKER_USER }}
 
-      - name: Build and run containers
+      - name: Run containers
         run: |
           docker-compose up -d
 
