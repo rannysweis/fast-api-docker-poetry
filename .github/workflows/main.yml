@@ -46,13 +46,9 @@ jobs:
         with:
           context: .
           push: true
-          tags: $IMAGE_NAME
+          tags: ${{ secrets.DOCKER_USER }}/fast-api-server:${{ hashFiles('**/Dockerfile') }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-        env:
-          DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
-          DOCKER_USER: ${{ secrets.DOCKER_USER }}
-          IMAGE_NAME: ${{ secrets.DOCKER_USER }}/fast-api-server:${{ hashFiles('**/Dockerfile') }}
 
       - name: Run containers
         run: |
