@@ -30,6 +30,8 @@ jobs:
         run: |
           docker buildx create --use
           docker buildx build --push -t fast-api-server .
+        env:
+          DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
 
   test:
     needs: build
