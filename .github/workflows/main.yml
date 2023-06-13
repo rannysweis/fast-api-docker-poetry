@@ -16,33 +16,35 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      - name: Cache Docker image
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: /var/lib/docker
-          key: fast-api-server-${{ hashFiles('**/Dockerfile') }}
-          restore-keys: |
-            fast-api-server-
+      - name: Check if tag exists
+        id: check_tag
+        run: |
+          echo $DOCKER_TOKEN | docker login -u $DOCKER_USER --password-stdin
+          if docker pull $DOCKER_USER/fast-api-server:${{ hashFiles('**/Dockerfile') }}; then
+            echo "::set-output name=tag_exists::true"
+          else
+            echo "::set-output name=tag_exists::false"
+          fi
 
       - name: Build and push Docker image
-        if: steps.cache.outputs.cache-hit != 'true'
+        if: steps.check_tag.outputs.tag_exists != 'true'
         run: |
           docker buildx create --use
           echo $DOCKER_TOKEN | docker login -u $DOCKER_USER --password-stdin
-          docker buildx build --push -t $DOCKER_USER/fast-api-server:latest .
+          docker buildx build --push -t $DOCKER_USER/fast-api-server:${{ hashFiles('**/Dockerfile') }} .
         env:
           DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
           DOCKER_USER: ${{ secrets.DOCKER_USER }}
 
       - name: Run containers
         run: |
-          docker-compose up -e IMAGE_NAME=$DOCKER_USER/fast-api-server:latest -d
+          docker-compose up -e IMAGE_NAME=$DOCKER_USER/fast-api-server:${{ hashFiles('**/Dockerfile') }} -d
         env:
           DOCKER_USER: ${{ secrets.DOCKER_USER }}
 
       - name: Run tests
         run: |
-          docker-compose run --rm fast-api-docker-poetry -e IMAGE_NAME=$DOCKER_USER/fast-api-server:latest poetry run pytest -v --durations=10 --durations-min=0.5
+          docker-compose run --rm -e IMAGE_NAME=$DOCKER_USER/fast-api-server:${{ hashFiles('**/Dockerfile') }} fast-api-docker-poetry poetry run pytest -v --durations=10 --durations-min=0.5
         env:
           DOCKER_USER: ${{ secrets.DOCKER_USER }}
+
