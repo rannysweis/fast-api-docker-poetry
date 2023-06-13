@@ -47,8 +47,8 @@ jobs:
           context: .
           push: true
           tags: ${{ secrets.DOCKER_USER }}/fast-api-server:${{ hashFiles('**/Dockerfile') }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,token=${{ secrets.DOCKER_TOKEN }}
+          cache-to: type=gha,mode=max,token=${{ secrets.DOCKER_TOKEN }}
 
       - name: Run containers
         run: |
