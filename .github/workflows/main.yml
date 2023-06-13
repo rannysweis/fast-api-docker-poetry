@@ -43,6 +43,6 @@ jobs:
 
       - name: Run tests
         run: |
-          docker-compose run -e IMAGE_NAME=$DOCKER_USER/fast-api-server:latest --rm fast-api-docker-poetry poetry run pytest -v --durations=10 --durations-min=0.5
+          docker-compose run --rm fast-api-docker-poetry -e IMAGE_NAME=$DOCKER_USER/fast-api-server:latest poetry run pytest -v --durations=10 --durations-min=0.5
         env:
           DOCKER_USER: ${{ secrets.DOCKER_USER }}
