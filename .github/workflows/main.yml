@@ -16,26 +16,39 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      - name: Check if tag exists
-        id: check_tag
-        run: |
-          echo $DOCKER_TOKEN | docker login -u $DOCKER_USER --password-stdin
-          if docker pull $IMAGE_NAME; then
-            echo "::set-output name=tag_exists::true"
-          else
-            echo "::set-output name=tag_exists::false"
-          fi
-        env:
-          DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
-          DOCKER_USER: ${{ secrets.DOCKER_USER }}
-          IMAGE_NAME: ${{ secrets.DOCKER_USER }}/fast-api-server:${{ hashFiles('**/Dockerfile') }}
+#      - name: Check if tag exists
+#        id: check_tag
+#        run: |
+#          echo $DOCKER_TOKEN | docker login -u $DOCKER_USER --password-stdin
+#          if docker pull $IMAGE_NAME; then
+#            echo "::set-output name=tag_exists::true"
+#          else
+#            echo "::set-output name=tag_exists::false"
+#          fi
+#        env:
+#          DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+#          DOCKER_USER: ${{ secrets.DOCKER_USER }}
+#          IMAGE_NAME: ${{ secrets.DOCKER_USER }}/fast-api-server:${{ hashFiles('**/Dockerfile') }}
+#
+#      - name: Build and push Docker image
+#        if: steps.check_tag.outputs.tag_exists != 'true'
+#        run: |
+#          docker buildx create --use
+#          echo $DOCKER_TOKEN | docker login -u $DOCKER_USER --password-stdin
+#          docker buildx build --push -t $IMAGE_NAME .
+#        env:
+#          DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+#          DOCKER_USER: ${{ secrets.DOCKER_USER }}
+#          IMAGE_NAME: ${{ secrets.DOCKER_USER }}/fast-api-server:${{ hashFiles('**/Dockerfile') }}
 
-      - name: Build and push Docker image
-        if: steps.check_tag.outputs.tag_exists != 'true'
-        run: |
-          docker buildx create --use
-          echo $DOCKER_TOKEN | docker login -u $DOCKER_USER --password-stdin
-          docker buildx build --push -t $IMAGE_NAME .
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: $IMAGE_NAME
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
         env:
           DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
           DOCKER_USER: ${{ secrets.DOCKER_USER }}
