@@ -29,9 +29,10 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           docker buildx create --use
-          docker buildx build --push --platform linux/amd64,linux/arm64 -t fast-api-server .
+          docker buildx build --push -t fast-api-server .
 
   test:
+    needs: build
     runs-on: ubuntu-latest
 
     steps:
