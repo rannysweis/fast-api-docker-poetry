@@ -27,7 +27,7 @@ jobs:
         run: |
           if docker pull $IMAGE_NAME; then
             echo "::set-output name=tag_exists::true"
-            docker ls -a
+            docker images
           else
             echo "::set-output name=tag_exists::false"
           fi
@@ -46,7 +46,7 @@ jobs:
 
       - name: Start containers
         run: |
-          docker ls -a
+          docker images
           docker-compose up -d
         env:
           IMAGE_NAME: ${{ secrets.DOCKER_USER }}/fast-api-server:${{ hashFiles('**/Dockerfile') }}
