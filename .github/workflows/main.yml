@@ -31,7 +31,7 @@ jobs:
             echo "::set-output name=tag_exists::false"
           fi
         env:
-          IMAGE_NAME: ${{ secrets.DOCKER_USER }}/fast-api-server:${{ hashFiles('**/Dockerfile') }}
+          IMAGE_NAME: ${{ secrets.DOCKER_USER }}/fast-api-server:${{ github.sha }}
 
       - name: Build and push
         if: steps.check_tag.outputs.tag_exists != 'true'
@@ -39,11 +39,12 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKER_USER }}/fast-api-server:${{ hashFiles('**/Dockerfile') }}
+          tags: ${{ secrets.DOCKER_USER }}/fast-api-server:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           target: development
 
+# used for local runner "act"
 #      - name: Install Docker Compose
 #        if: steps.check_tag.outputs.tag_exists != 'true'
 #        run: |
@@ -56,5 +57,5 @@ jobs:
           docker-compose up -d
           docker-compose run --rm fast-api-docker-poetry poetry run pytest -v --durations=10 --durations-min=0.5
         env:
-          IMAGE_NAME: ${{ secrets.DOCKER_USER }}/fast-api-server:${{ hashFiles('**/Dockerfile') }}
+          IMAGE_NAME: ${{ secrets.DOCKER_USER }}/fast-api-server:${{ github.sha }}
 
