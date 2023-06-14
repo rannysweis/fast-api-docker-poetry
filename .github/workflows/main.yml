@@ -52,9 +52,14 @@ jobs:
 #              -o /usr/local/bin/docker-compose
 #          sudo chmod +x /usr/local/bin/docker-compose
 
-      - name: Run tests
+      - name: Start containers
         run: |
           docker-compose up -d
+        env:
+          IMAGE_NAME: ${{ secrets.DOCKER_USER }}/fast-api-server:${{ github.sha }}
+
+      - name: Run tests
+        run: |
           docker-compose run --rm fast-api-docker-poetry poetry run pytest -v --durations=10 --durations-min=0.5
         env:
           IMAGE_NAME: ${{ secrets.DOCKER_USER }}/fast-api-server:${{ github.sha }}
