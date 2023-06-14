@@ -43,12 +43,6 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-#      - name: Start containers
-#        run: |
-#          docker-compose up -d
-#        env:
-#          IMAGE_NAME: ${{ secrets.DOCKER_USER }}/fast-api-server:${{ hashFiles('**/Dockerfile') }}
-
       - name: Run tests
         run: |
           make testd

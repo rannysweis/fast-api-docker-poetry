@@ -10,7 +10,7 @@ startslimd:
 		&& docker-compose run --rm fast-api-docker-poetry poetry run alembic upgrade head
 
 testd:
-	docker-compose up -d --build \
+	docker-compose up -d \
 		&& docker-compose run --rm fast-api-docker-poetry poetry run pytest -v --durations=10 --durations-min=0.5
 
 startp:
