@@ -27,7 +27,6 @@ jobs:
         run: |
           if docker pull $IMAGE_NAME; then
             echo "::set-output name=tag_exists::true"
-            docker images
           else
             echo "::set-output name=tag_exists::false"
           fi
@@ -44,15 +43,15 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Start containers
-        run: |
-          docker images
-          docker-compose up -d
-        env:
-          IMAGE_NAME: ${{ secrets.DOCKER_USER }}/fast-api-server:${{ hashFiles('**/Dockerfile') }}
+#      - name: Start containers
+#        run: |
+#          docker-compose up -d
+#        env:
+#          IMAGE_NAME: ${{ secrets.DOCKER_USER }}/fast-api-server:${{ hashFiles('**/Dockerfile') }}
 
       - name: Run tests
         run: |
+          docker-compose up fast-api-postgres -d
           docker-compose run --rm fast-api-docker-poetry poetry run pytest -v --durations=10 --durations-min=0.5
         env:
           IMAGE_NAME: ${{ secrets.DOCKER_USER }}/fast-api-server:${{ hashFiles('**/Dockerfile') }}
