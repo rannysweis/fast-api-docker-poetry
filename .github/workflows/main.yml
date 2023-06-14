@@ -53,7 +53,7 @@ jobs:
 
       - name: Run tests
         run: |
-          docker-compose up --build -d fast-api-postgres
+          docker-compose up -d
           docker-compose run --rm fast-api-docker-poetry poetry run pytest -v --durations=10 --durations-min=0.5
         env:
           IMAGE_NAME: ${{ secrets.DOCKER_USER }}/fast-api-server:${{ hashFiles('**/Dockerfile') }}
