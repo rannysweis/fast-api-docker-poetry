@@ -31,7 +31,7 @@ jobs:
             echo "::set-output name=tag_exists::false"
           fi
         env:
-          IMAGE_NAME: ${{ secrets.DOCKER_USER }}/fast-api-server:${{ github.sha }}
+          IMAGE_NAME: ${{ secrets.DOCKER_USER }}/fast-api-server:${{ hashFiles('**/Dockerfile') }}${{ hashFiles('**/poetry.lock') }}
 
       - name: Build and push
         if: steps.check_tag.outputs.tag_exists != 'true'
@@ -39,28 +39,21 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKER_USER }}/fast-api-server:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          tags: ${{ secrets.DOCKER_USER }}/fast-api-server:${{ hashFiles('**/Dockerfile') }}${{ hashFiles('**/poetry.lock') }}
+          cache-from: type=registry,ref=${{ secrets.DOCKER_USER }}/fast-api-server
+          cache-to: type=registry,mode=max,ref=${{ secrets.DOCKER_USER }}/fast-api-server
           target: development
 
 # used for local runner "act"
 #      - name: Install Docker Compose
-#        if: steps.check_tag.outputs.tag_exists != 'true'
 #        run: |
 #          sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" \
 #              -o /usr/local/bin/docker-compose
 #          sudo chmod +x /usr/local/bin/docker-compose
 
-      - name: Start containers
-        run: |
-          docker-compose up -d
-        env:
-          IMAGE_NAME: ${{ secrets.DOCKER_USER }}/fast-api-server:${{ github.sha }}
-
       - name: Run tests
         run: |
           docker-compose run --rm fast-api-docker-poetry poetry run pytest -v --durations=10 --durations-min=0.5
         env:
-          IMAGE_NAME: ${{ secrets.DOCKER_USER }}/fast-api-server:${{ github.sha }}
+          IMAGE_NAME: ${{ secrets.DOCKER_USER }}/fast-api-server:${{ hashFiles('**/Dockerfile') }}${{ hashFiles('**/poetry.lock') }}
 
