@@ -15,7 +15,12 @@ ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:$PATH"
 ENV PYTHONPATH="${PYTHONPATH}:${PYSETUP_PATH}"
 
 RUN apt-get update && apt-get upgrade -y
-RUN apt-get install --no-install-recommends -y curl
+RUN apt-get install --no-install-recommends -y \
+    curl \
+    gcc \
+    python3-dev \
+    libffi-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 #make lsb-release wget gnupg curl build-essential gcc libpq-dev
 #RUN apk add -y bash libstdc++ build-essential linux-headers-generic git gcc musl-dev python3-dev libffi-dev curl
